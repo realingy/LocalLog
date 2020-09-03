@@ -6,9 +6,7 @@
 
 namespace llog {
 
-// 这个类主要是日志流的实现
-// 其实就是重载了操作符<<
-// 可能没有考虑到所有情况
+// 这个类是日志流的实现，重载了操作符<<, 可能没有考虑到所有情况
 class LogStream {
 public:
     LogStream();

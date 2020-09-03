@@ -7,25 +7,25 @@
 
 namespace llog {
 
+// DEBUG:指出细粒度信息事件对调试应用程序是非常有帮助的
+// INFO:消息在粗粒度级别上突出强调应用程序的运行
+// WARN:表明会出现潜在错误的情况
+// ERROR:指出虽然发生错误事件，但不影响系统的继续运行。
+// FATAL:指出每个严重的错误事件将会导致应用程序的退出。
+
+// 当我们定义了日志的优先级之后，应用程序中比设置的优先级别低的都会被输出
+enum LogLevel {
+    DEBUG = 0,
+    INFO,
+    WARN,
+    ERROR,
+    FATAL
+};
+
 class LogRealize;
 
 class Logger {
 public:
-    // DEBUG:指出细粒度信息事件对调试应用程序是非常有帮助的
-    // INFO:消息在粗粒度级别上突出强调应用程序的运行
-    // WARN:表明会出现潜在错误的情况
-    // ERROR:指出虽然发生错误事件，但不影响系统的继续运行。
-    // FATAL:指出每个严重的错误事件将会导致应用程序的退出。
-
-    // 当我们定义了日志的优先级之后，应用程序中比设置的优先级别低的都会被输出
-    enum LogLevel {
-        DEBUG = 0,
-        INFO,
-        WARN,
-        ERROR,
-        FATAL
-    };
-
     // 写日志的方法指针
     typedef void (*OutputFunc)(const char* msg, int len);
 
@@ -81,6 +81,32 @@ private:
 
 #define LOG_FATAL Logger(__FILE__, Logger::FATAL, __LINE__).GetLogStream()
 #endif
+
+LogStream& LOG(LogLevel level)
+{
+    switch (level) {
+    case LogLevel::DEBUG:
+        if (Logger::getLogLevel() <= LogLevel::DEBUG)
+            return Logger(__FILE__, LogLevel::DEBUG, __LINE__).GetLogStream();
+        break;
+    case LogLevel::INFO:
+        if (Logger::getLogLevel() <= LogLevel::INFO)
+            return Logger(__FILE__, LogLevel::INFO, __LINE__).GetLogStream();
+        break;
+    case LogLevel::WARN:
+        if (Logger::getLogLevel() <= LogLevel::WARN)
+            return Logger(__FILE__, LogLevel::WARN, __LINE__).GetLogStream();
+        break;
+    case LogLevel::ERROR:
+        return Logger(__FILE__, LogLevel::ERROR, __LINE__).GetLogStream();
+        break;
+    case LogLevel::FATAL:
+        return Logger(__FILE__, LogLevel::FATAL, __LINE__).GetLogStream();
+        break;
+    default:
+        break;
+    }
+}
 
 }
 

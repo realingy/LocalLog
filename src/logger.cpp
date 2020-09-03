@@ -7,7 +7,7 @@
 namespace llog {
 const char* arrLevel[] = { "[DEBUG] ", "[INFO] ", "[WARN] ", "[ERROR] ", "[FATAL] " };
 
-Logger::LogLevel gLogLevel = Logger::INFO; //默认的日志等级为INFO
+LogLevel gLogLevel = LogLevel::INFO; //默认的日志等级为INFO
 int gLogMode = LOGGER_MODE_STDOUT; //默认的输出模式为输出到标准输出
 
 void WriteStdOut(const char* pMsg, int len)
@@ -48,7 +48,7 @@ LogStream& Logger::GetLogStream(void)
     return realize_->getlogstream();
 }
 
-Logger::LogLevel Logger::getLogLevel(void)
+LogLevel Logger::getLogLevel(void)
 {
     return gLogLevel;
 }

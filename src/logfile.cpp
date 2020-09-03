@@ -2,9 +2,9 @@
 #include <string>
 #include <time.h>
 
-#ifdef __unix
 #include <sys/stat.h>
 #include <sys/types.h>
+#ifdef __unix
 #include <unistd.h>
 #endif
 
