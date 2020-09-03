@@ -1,17 +1,9 @@
-/**
- * @file main.cpp
- * @brief  
- * @author  
- * @version 1.0
- * @date 2018年08月07日 16时39分48秒
- */
-
-//测试用例
+﻿//测试用例
 #include <iostream>
-#include "locallog/logger.h"
+#include "logger.h"
  
 using namespace std;
-using namespace Log;
+using namespace llog;
 
 int add(int a, int b)
 {
@@ -40,9 +32,7 @@ int divide(int a, int b)
 
 int main(void)
 {
-    //日志的报警等级为INFO
     Logger::setLogLevel(Logger::INFO);
-    //我们设置日志输出到文件和标准输出
     Logger::setOutputMode(LOGGER_MODE_OUTANDFILE);
 
     LOG_INFO << "The test program began to run!";
