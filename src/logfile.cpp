@@ -1,134 +1,138 @@
-/**
- * @file logfile.cpp
- * @brief  
- * @author  
- * @version 1.0
- * @date 2018年08月03日 11时25分15秒
- */
-
+﻿#include <iostream>
 #include <string>
 #include <time.h>
-#include <iostream>
+
+#ifdef __unix
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+#endif
+
 #include "logfile.h"
 
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
- 
-namespace Log
+namespace llog {
+static const char LogDir[] = "/work/log/";
+
+LogFile::LogFile()
+//: mutex_()
 {
-    static const char LogDir[] = "/work/log/";
+    time_t timep;
+    struct tm* pTm;
+    time(&timep);
+    pTm = localtime(&timep);
 
-    LogFile::LogFile()
-        //: m_Mutex()
-    {
-        time_t timep;
-        struct tm *pTm;
-        time(&timep);
-        pTm = localtime(&timep);
+    date_->day_ = pTm->tm_mday;
+    date_->month_ = pTm->tm_mon + 1;
+    date_->year_ = pTm->tm_year + 1900;
 
-        m_Date.m_iDay = pTm->tm_mday;
-        m_Date.m_iMon = pTm->tm_mon + 1;
-        m_Date.m_iYear = pTm->tm_year + 1900;
-	
-        createLogDir(); //创建存放Log的目录
-        openLogFile(); //打开对应日志文件 
-    }
-	
-    LogFile::~LogFile()
-    {
-	
-    }
+    createdir(); //创建存放Log的目录
+    openfile(); //打开对应日志文件
+}
 
-    /* 单例写日志功能 */
-    void LogFile::WriteLog(const char *pMsg, int iLen)
-    {
-        LogFile *pLogFile = instance();
-        pLogFile->OutputLogFile(pMsg, iLen);
-    }
- 
-    /* 单例缓存清空功能 */
-    void LogFile::FlushBuffer(void)
-    {
-        LogFile *pLogFile = instance();
-        pLogFile->FlushLogFile();
-    }
- 
-    /* 写日志 */
-    void LogFile::OutputLogFile(const char *pMsg, int len)
-    {
-        //boost::mutex::scoped_lock lock(m_Mutex);
-        if (m_pFile != NULL)
-            ::fwrite(pMsg, 1, len, m_pFile);
-    }
+LogFile::~LogFile()
+{
+}
 
-    /* 清空缓存 */
-    void LogFile::FlushLogFile(void)
-    {
-        //boost::mutex::scoped_lock lock(m_Mutex);
-        ::fflush(m_pFile);
-    }
- 
-    /* 单例模式 */
-    LogFile *LogFile::instance(void)
-    {
-        static LogFile tLogFile;
-        return &tLogFile;
-    }
- 
-    /* 创建目录 */
-    void LogFile::createLogDir(void)
-    {	
-        if (access(LogDir, F_OK) == -1)
-	{
-            //不存在这个目录，创建它 
-            mkdir(LogDir, 0777);
-        }
-    }
-	
-    /* 获取日志文件名 */
-    string LogFile::getLogFileName(void)
-    {
-        char arrBuffer[64]; //绝对路径文件名
-        memset(arrBuffer, 0x00, sizeof(arrBuffer));
+void LogFile::writelog(const char* msg, int len)
+{
+    LogFile::instance()->writelogfile(msg, len);
+}
 
-        snprintf(arrBuffer, sizeof(arrBuffer), "%04d-%02d-%02d-Log.txt",
-            m_Date.m_iYear, m_Date.m_iMon, m_Date.m_iDay);
-	
-        return arrBuffer;
-    }
- 
-    /* 打开日志文件 */
-    void LogFile::openLogFile(void)
-    {
-        char arrBuffer[64]; //绝对文件名
-        string fileName = getLogFileName();
-        memset(arrBuffer, 0x00, sizeof(arrBuffer));
+// 单例缓存清空功能
+void LogFile::flushbuffer()
+{
+    LogFile::instance()->flushlogfile();
+}
 
-        snprintf(arrBuffer, sizeof(arrBuffer), "%s/%s", LogDir, fileName.c_str());
-
-        //boost::mutex::scoped_lock lock(m_Mutex);
-        m_pFile = fopen(arrBuffer, "a");
+// 写日志
+void LogFile::writelogfile(const char* msg, int len)
+{
+    //boost::mutex::scoped_lock lock(mutex_);
+    if (file_ != NULL) {
+        ::fwrite(msg, 1, len, file_);
     }
- 
-    /* 如果是新的一天则重新创建新的日志文件,并更新日期结构体 */
-    void LogFile::updateLogFile(LOGDATE *pDate)
-    {
-        if (pDate == NULL)
-            return;
+}
 
-        if (m_Date.m_iYear != pDate->m_iYear || m_Date.m_iMon != pDate->m_iMon || m_Date.m_iDay != pDate->m_iDay)
-        {
-            //新的一天开始了，那么就，关闭之前的。重新创建个对应日期的日志文件。
-            m_Date.m_iYear = pDate->m_iYear;
-            m_Date.m_iMon = pDate->m_iMon;
-            m_Date.m_iDay = pDate->m_iDay;
-	
-            FlushLogFile();
-            fclose(m_pFile);
-            m_pFile = NULL;
-	
-            openLogFile();
-        }
+// 清空缓存
+void LogFile::flushlogfile()
+{
+    //boost::mutex::scoped_lock lock(mutex_);
+    ::fflush(file_);
+}
+
+// 单例模式
+LogFile* LogFile::instance()
+{
+    static LogFile inst;
+    return &inst;
+}
+
+void LogFile::createdir()
+{
+#ifdef __unix
+    if (access(LogDir, F_OK) == -1) {
+        //不存在这个目录，创建它
+        mkdir(LogDir, 0777);
     }
+#else
+
+#endif
+}
+
+// 获取日志文件名
+std::string LogFile::getfilename(void)
+{
+    char buffer[64]; //绝对路径文件名
+#ifdef __unix
+    memset(buffer, 0x00, sizeof(buffer));
+
+    snprintf(buffer, sizeof(arrBuffer), "%04d-%02d-%02d-Log.txt",
+        date_->year_, date_.month_, date_.day_);
+#else
+
+#endif
+    return buffer;
+}
+
+// 打开日志文件
+void LogFile::openfile()
+{
+#ifdef _unix
+    char arrBuffer[64]; //绝对文件名
+    string fileName = getLogFileName();
+    memset(arrBuffer, 0x00, sizeof(arrBuffer));
+
+    snprintf(arrBuffer, sizeof(arrBuffer), "%s/%s", LogDir, fileName.c_str());
+
+    //boost::mutex::scoped_lock lock(mutex_);
+    file_ = fopen(arrBuffer, "a");
+#else
+    // Q_OS_WIN
+    std::cout << "win32";
+#endif
+}
+
+// 如果是新的一天则重新创建日志文件并更新日期结构体
+void LogFile::updatefile(Date* date)
+{
+#ifndef __unix
+    if (date == NULL)
+        return;
+
+    if (date_->year_ != date->year_ || date_->month_ != date->month_ || date_->day_ != date->day_) {
+        //新的一天开始了，则关闭之前的，重新创建个对应日期的日志文件。
+        date_->year_ = date->year_;
+        date_->month_ = date->month_;
+        date_->day_ = date->day_;
+
+        flushlogfile();
+        fclose(file_);
+        file_ = NULL;
+
+        openfile();
+    }
+#else
+
+#endif
+}
 }
