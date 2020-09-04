@@ -41,7 +41,7 @@ public:
     //设置输出模式的，支持3种输出模式
     static void setOutputMode(int iMode);
 
-    Logger(FileName SourceFile, LogLevel Level, int line);
+	Logger(FileName absolute, LogLevel level, int line);
     ~Logger();
 
     //获取日志流
@@ -56,7 +56,7 @@ private:
     //使用Pimpl机制,解开类的使用接口和实现的耦合
     //std::shared_ptr<LogRealize> realize_; //使用智能指针来管理
     LogRealize* realize_;
-    LogLevel m_LogLevel;
+    LogLevel level_;
 };
 
 //这几个宏是用来设置输出模式的：输出到标准输出 输出到log文件 输出到标准输出和log文件
@@ -65,23 +65,24 @@ private:
 #define LOGGER_MODE_OUTANDFILE (LOGGER_MODE_STDOUT | LOGGER_MODE_LOGFILE)
 
 #if 1
-#define LOG_DEBUG                               \
-    if (Logger::getLogLevel() <= Logger::DEBUG) \
-    Logger(__FILE__, Logger::DEBUG, __LINE__).GetLogStream()
+#define LOG_DEBUG                       \
+    if (Logger::getLogLevel() <= DEBUG) \
+    Logger(__FILE__, DEBUG, __LINE__).GetLogStream()
 
-#define LOG_INFO                               \
-    if (Logger::getLogLevel() <= Logger::INFO) \
-    Logger(__FILE__, Logger::INFO, __LINE__).GetLogStream()
+#define LOG_INFO                       \
+    if (Logger::getLogLevel() <= INFO) \
+    Logger(__FILE__, INFO, __LINE__).GetLogStream()
 
-#define LOG_WARN                               \
-    if (Logger::getLogLevel() <= Logger::WARN) \
-    Logger(__FILE__, Logger::WARN, __LINE__).GetLogStream()
+#define LOG_WARN                       \
+    if (Logger::getLogLevel() <= WARN) \
+    Logger(__FILE__, WARN, __LINE__).GetLogStream()
 
-#define LOG_ERROR Logger(__FILE__, Logger::ERROR, __LINE__).GetLogStream()
+#define LOG_ERROR Logger(__FILE__, ERROR, __LINE__).GetLogStream()
 
-#define LOG_FATAL Logger(__FILE__, Logger::FATAL, __LINE__).GetLogStream()
+#define LOG_FATAL Logger(__FILE__, FATAL, __LINE__).GetLogStream()
 #endif
 
+/*
 LogStream& LOG(LogLevel level)
 {
     switch (level) {
@@ -107,6 +108,7 @@ LogStream& LOG(LogLevel level)
         break;
     }
 }
+*/
 
 }
 

@@ -10,7 +10,7 @@ namespace llog {
 class LogRealize {
 
 public:
-    LogRealize(FileName& filename, const char* level, int line);
+    LogRealize(const char * filename, const char* level, int line);
     ~LogRealize();
 
     LogStream& getlogstream();
@@ -23,7 +23,7 @@ public:
 private:
     int line_; //行号
     LogTime time_;
-    FileName filename_;
+    const char * filename_;
     LogStream stream_;
 };
 

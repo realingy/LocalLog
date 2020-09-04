@@ -28,7 +28,7 @@ private:
     void openfile();
 
 private:
-    Date* date_;
+    Date date_;
     // std::fstream filestream_;
     FILE* file_;
     // stdL::mutex mutex_;

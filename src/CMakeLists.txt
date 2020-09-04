@@ -9,6 +9,9 @@ SET(CMAKE_INSTALL_PREFIX llog)
 FILE(GLOB DIR_HEAD *.h)
 aux_source_directory(. DIR_SRCS)
 
+# debug后缀
+set(CMAKE_DEBUG_POSTFIX "d")
+
 add_library(llog SHARED ${DIR_SRCS} ${DIR_HEAD})
 
 add_library(llog_static STATIC ${DIR_SRCS} ${DIR_HEAD})

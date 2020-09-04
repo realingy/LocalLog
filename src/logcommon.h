@@ -1,7 +1,8 @@
 ﻿#ifndef __LOG_COMMON_H__
 #define __LOG_COMMON_H__
 
-#include <string.h>
+#include <iostream>
+#include <string>
 
 namespace llog {
 
@@ -18,12 +19,32 @@ public:
         : filename_(absolute)
         , len_(static_cast<int>(strlen(absolute)))
     {
-        const char* pTmp = strrchr(absolute, '/');
+#ifdef __unix
+		const char* pTmp = strrchr(absolute, '/');
 
-        if (pTmp != NULL) {
-            filename_ = pTmp + 1;
-            len_ = static_cast<int>(strlen(filename_));
-        }
+		if (pTmp != NULL) {
+			filename_ = pTmp + 1;
+			len_ = static_cast<int>(strlen(filename_));
+		}
+#else
+		const char* pTmp = strrchr(absolute, '\\');
+
+		if (pTmp != NULL) {
+			filename_ = pTmp + 1;
+			len_ = static_cast<int>(strlen(filename_));
+		}
+
+		/*
+		std::string abspath(absolute);
+		auto const pos = abspath.find_last_of('\\');
+		const auto leaf = abspath.substr(pos + 1);
+		filename_ = leaf.c_str();
+		complete_ = leaf;
+		len_ = static_cast<int>(strlen(filename_));
+		std::cout << "1111111111: " << filename_ << std::endl;
+		std::cout << "2222222222: " << complete_ << std::endl;
+		*/
+#endif
     }
 
     const char* filename_;
