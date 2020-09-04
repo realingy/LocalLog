@@ -1,2 +1,12 @@
 # LocalLog
-### a simple log platform
+
+### 简单的日志库
+
+##### 构建
+###### 1、在unix环境中，通过GNUMake构建工程
+###### 2、在Windows中，通过CMake构建工程
+
+##### 运行
+###### 1、在unix环境中，通过命令行启动
+###### 2、在windows环境中，通过vs启动或者直接双击exe可执行文件启动
+
