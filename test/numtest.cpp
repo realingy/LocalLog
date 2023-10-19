@@ -1,69 +1,61 @@
 ﻿//测试用例
-#include "logger.h"
 #include <iostream>
+
+#include "logger.h"
+
 
 using namespace std;
 using namespace llog;
 
-int add(int a, int b)
-{
-    return a + b;
+int add(int a, int b) { return a + b; }
+
+int sub(int a, int b) { return a - b; }
+
+int mult(int a, int b) { return a * b; }
+
+int divide(int a, int b) {
+  if (0 == b) {
+    LOG_FATAL << "Divisor cannot be zero";
+  }
+
+  return a / b;
 }
 
-int sub(int a, int b)
-{
-    return a - b;
-}
+int main(void) {
+  Logger::setLogLevel(INFO);
+  Logger::setOutputMode(LOGGER_MODE_OUTANDFILE);
 
-int mult(int a, int b)
-{
-    return a * b;
-}
+  // std::cout << __FILE__ << std::endl;
+  // std::cout << INFO << std::endl;
+  // std::cout << __LINE__ << std::endl;
+  // Logger(__FILE__, INFO, __LINE__).GetLogStream() << "log test!\n";
 
-int divide(int a, int b)
-{
-    if (0 == b) {
-        LOG_FATAL << "Divisor cannot be zero";
-    }
+  LOG_INFO << "The test program began to run!";
+  LOG_DEBUG << "Debug Mode!";
 
-    return a / b;
-}
+  int iNum1;
+  int iNum2;
+  int iSum;
 
-int main(void)
-{
-    Logger::setLogLevel(INFO);
-    Logger::setOutputMode(LOGGER_MODE_OUTANDFILE);
+  cout << "Please inout two number:" << endl;
+  cin >> iNum1 >> iNum2;
 
-    //std::cout << __FILE__ << std::endl;
-    //std::cout << INFO << std::endl;
-    //std::cout << __LINE__ << std::endl;
-	//Logger(__FILE__, INFO, __LINE__).GetLogStream() << "log test!\n";
+  LOG_INFO << "User input two number: " << iNum1 << ", " << iNum2;
 
-    LOG_INFO << "The test program began to run!";
-    LOG_DEBUG << "Debug Mode!";
+  iSum = add(iNum1, iNum2);
+  LOG_INFO << "iNum1 + iNum2 =  " << iSum;
 
-    int iNum1;
-    int iNum2;
-    int iSum;
+  iSum = sub(iNum1, iNum2);
+  LOG_INFO << "iNum1 - iNum2 = " << iSum;
 
-    cout << "Please inout two number:" << endl;
-    cin >> iNum1 >> iNum2;
+  iSum = mult(iNum1, iNum2);
+  LOG_INFO << "iNum1 * iNum2 = " << iSum;
 
-    LOG_INFO << "User input two number: " << iNum1 << ", " << iNum2;
+  iSum = divide(iNum1, iNum2);
+  LOG_INFO << "iNum1 / iNum2 = " << iSum;
+  LOG_DEBUG << "iNum1 / iNum2 = " << iSum;
 
-    iSum = add(iNum1, iNum2);
-    LOG_INFO << "iNum1 + iNum2 =  " << iSum;
+  LOG_INFO << "The test program end!";
 
-    iSum = sub(iNum1, iNum2);
-    LOG_INFO << "iNum1 - iNum2 = " << iSum;
-
-    iSum = mult(iNum1, iNum2);
-    LOG_INFO << "iNum1 * iNum2 = " << iSum;
-
-    iSum = divide(iNum1, iNum2);
-    LOG_INFO << "iNum1 / iNum2 = " << iSum;
-
-    LOG_INFO << "The test program end!";
-
-    return 0;
+  return 0;
 }

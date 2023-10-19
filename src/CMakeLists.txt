@@ -26,11 +26,11 @@ set_target_properties(llog_static PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 # 设置库文件的安装路径为../output下的lib
 # INSTALL(TARGETS llog LIBRARY DESTINATION ${PROJECT_SOURCE_DIR}/llog)
 
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/llog)
+set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/llog/lib)
 
 # 头文件输出
 set(HEADER "logger.h" "logstream.h" "logcommon.h")
-FILE(COPY ${HEADER} DESTINATION "${LIBRARY_OUTPUT_PATH}/include")
+FILE(COPY ${HEADER} DESTINATION "${CMAKE_SOURCE_DIR}/llog/include")
 
 # 将动态库与动态库同时安装到lib目录中
 install (TARGETS llog llog_static DESTINATION ${PROJECT_SOURCE_DIR}/llog/bin)
